@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:coupon_collection/core/router/app_router.gr.dart';
 import 'package:coupon_collection/core/styles/textgetter.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -45,7 +46,9 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: [
             IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  AutoRouter.of(context).push(const NewCouponPageRoute());
+                },
                 icon: const Icon(
                   Icons.add,
                   color: Colors.white,
@@ -72,7 +75,7 @@ class _HomePageState extends State<HomePage> {
                       DropdownButtonHideUnderline(
                         child: DropdownButton2<String>(
                           isExpanded: true,
-                          hint: Text('優惠券分類',
+                          hint: Text("優惠券分類",
                               style: textgetter.bodyMedium
                                   ?.copyWith(color: Color(0xff2E2E2E))),
                           items: _addDividersAfterItems(items),
@@ -111,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                       DropdownButtonHideUnderline(
                         child: DropdownButton2<String>(
                           isExpanded: true,
-                          hint: Text('使用效期',
+                          hint: Text("使用效期",
                               style: textgetter.bodyMedium
                                   ?.copyWith(color: Color(0xff2E2E2E))),
                           items: _addDividersAfterItems2(items2),
@@ -154,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                           customButton:
                               Image.asset("image/filter_list_off.png"),
                           isExpanded: true,
-                          hint: Text('使用效期',
+                          hint: Text("使用效期",
                               style: textgetter.bodyMedium
                                   ?.copyWith(color: Color(0xff2E2E2E))),
                           items: _addDividersAfterItems2(items2),
@@ -220,7 +223,8 @@ class _HomePageState extends State<HomePage> {
                       const Padding(padding: EdgeInsets.all(12)),
                       DottedBorder(
                         dashPattern: const [8, 4],
-                        strokeWidth: 2,
+                        borderType: BorderType.RRect,
+                        strokeWidth: 1,
                         color: const Color(0xffD2D2D2),
                         radius: const Radius.circular(10),
                         child: Container(
