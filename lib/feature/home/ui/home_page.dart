@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
           actions: [
             IconButton(
                 onPressed: () {
-                  AutoRouter.of(context).push(const NewCouponPageRoute());
+                  // AutoRouter.of(context).push(const NewCouponPageRoute());
                 },
                 icon: const Icon(
                   Icons.add,

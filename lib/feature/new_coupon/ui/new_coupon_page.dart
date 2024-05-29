@@ -3,7 +3,6 @@ import 'package:coupon_collection/core/styles/textgetter.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
 
 @RoutePage()
 class NewCouponPage extends StatefulWidget {
@@ -27,11 +26,10 @@ class _NewCouponPageState extends State<NewCouponPage> {
   @override
   Widget build(BuildContext context) {
     final TextGetter textgetter = TextGetter(context);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xffEE95A4),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           "新增優惠券",
           style: textgetter.titleLarge

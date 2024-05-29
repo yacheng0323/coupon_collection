@@ -1,9 +1,9 @@
+import 'package:coupon_collection/core/injections.dart';
 import 'package:coupon_collection/core/router/app_router.dart';
-import 'package:coupon_collection/core/styles/textgetter.dart';
-import 'package:coupon_collection/feature/home/ui/home_page.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
+  await initInjections();
   runApp(const MyApp());
 }
 
