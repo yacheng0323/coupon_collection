@@ -1,8 +1,14 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:coupon_collection/core/styles/textgetter.dart';
+import 'package:coupon_collection/core/utils/dropdown_item.dart';
+import 'package:coupon_collection/feature/new_coupon/domain/new_coupon_view_model.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 @RoutePage()
 class NewCouponPage extends StatefulWidget {
@@ -13,264 +19,367 @@ class NewCouponPage extends StatefulWidget {
 }
 
 class _NewCouponPageState extends State<NewCouponPage> {
-  final List<String> items = [
-    "全部",
-    "電子產品",
-    "美妝",
-    "生活百貨",
-    "食品",
-    "服飾",
-    "其他",
-  ];
-  String? selectedValue;
+  final formKey = GlobalKey<FormState>();
+  late final storeNameController = TextEditingController();
+  late final contentController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    storeNameController.dispose();
+    contentController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextGetter textgetter = TextGetter(context);
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xffEE95A4),
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          "新增優惠券",
-          style: textgetter.titleLarge
-              ?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () {},
-              child: Text(
-                "完成",
-                style: textgetter.titleMedium?.copyWith(
-                    color: Colors.white, fontWeight: FontWeight.w700),
-              )),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Image.asset(
-            "image/background.png",
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            fit: BoxFit.cover,
-          ),
-          SingleChildScrollView(
-            child: Form(
-              // key: ,
-              child: Container(
-                padding: EdgeInsets.fromLTRB(30, 40, 30, 0),
-                child: Column(
+    return PopScope(
+      canPop: false,
+      child: ChangeNotifierProvider(
+        create: (context) {
+          NewCouponViewModel newCouponViewModel = NewCouponViewModel();
+
+          return newCouponViewModel;
+        },
+        builder: (context, child) {
+          return Consumer<NewCouponViewModel>(
+            builder: (context, provider, child) {
+              return Scaffold(
+                appBar: AppBar(
+                  backgroundColor: const Color(0xffEE95A4),
+                  iconTheme: const IconThemeData(color: Colors.white),
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back_ios_new_outlined),
+                    onPressed: () {
+                      showCupertinoDialog(
+                          context: context,
+                          builder: (context) {
+                            return CupertinoAlertDialog(
+                              title: Text("Quit"),
+                              content: Text("Are you sure to leave right now？"),
+                              actions: [
+                                CupertinoDialogAction(
+                                  child: Text("No"),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                CupertinoDialogAction(
+                                  child: Text("Yes"),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                )
+                              ],
+                            );
+                          });
+                    },
+                  ),
+                  title: Text(
+                    "Add New",
+                    style: textgetter.titleLarge?.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.w700),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          if (formKey.currentState?.validate() == true) {}
+                        },
+                        child: Text(
+                          "Done",
+                          style: textgetter.titleMedium?.copyWith(
+                              color: Colors.white, fontWeight: FontWeight.w700),
+                        )),
+                  ],
+                ),
+                body: Stack(
                   children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                          hintText: "輸入店家名",
-                          filled: true,
-                          fillColor: Colors.white,
-                          hintStyle: textgetter.bodyMedium
-                              ?.copyWith(color: Color(0xffAAAAAA)),
-                          contentPadding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(10))),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
+                    Image.asset(
+                      "image/background.png",
+                      height: MediaQuery.of(context).size.height,
                       width: MediaQuery.of(context).size.width,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton2<String>(
-                          isExpanded: true,
-                          hint: Text("優惠券分類",
-                              style: textgetter.bodyMedium
-                                  ?.copyWith(color: Color(0xffAAAAAA))),
-                          items: _addDividersAfterItems(items),
-                          value: selectedValue,
-                          onChanged: (String? value) {
-                            setState(() {
-                              selectedValue = value;
-                            });
-                          },
-                          buttonStyleData: const ButtonStyleData(
-                            padding: EdgeInsets.fromLTRB(2, 0, 2, 0),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                          ),
-                          dropdownStyleData: const DropdownStyleData(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(8),
-                                bottomRight: Radius.circular(8),
+                      fit: BoxFit.cover,
+                    ),
+                    SingleChildScrollView(
+                      child: Form(
+                        key: formKey,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(30, 40, 30, 0),
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                controller: storeNameController,
+                                style: textgetter.bodyLarge?.copyWith(
+                                    color: Color(0xff6D93F7),
+                                    fontWeight: FontWeight.w700),
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(100)
+                                ],
+                                decoration: InputDecoration(
+                                    hintText: "Store Name",
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    hintStyle: textgetter.bodyMedium?.copyWith(
+                                        color: const Color(0xffAAAAAA)),
+                                    errorStyle: textgetter.bodySmall
+                                        ?.copyWith(color: Colors.red),
+                                    contentPadding:
+                                        const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                                    border: OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                        borderRadius:
+                                            BorderRadius.circular(10))),
+                                validator: (value) {
+                                  return value?.isEmpty == true
+                                      ? "店家名稱為必填喔！"
+                                      : null;
+                                },
                               ),
-                            ),
-                          ),
-                          menuItemStyleData: MenuItemStyleData(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            customHeights: _getCustomItemsHeights(),
-                          ),
-                          iconStyleData: const IconStyleData(
-                            iconSize: 30,
-                            openMenuIcon: Icon(Icons.arrow_drop_up),
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton2<String>(
+                                    isExpanded: true,
+                                    hint: Text("Category",
+                                        style: textgetter.bodyMedium?.copyWith(
+                                            color: const Color(0xffAAAAAA))),
+                                    items: categoryList.map((item) {
+                                      return DropdownMenuItem<String>(
+                                          value: item,
+                                          child: Center(
+                                            child: Text(
+                                              item,
+                                              style: provider.category == item
+                                                  ? textgetter.bodyMedium
+                                                      ?.copyWith(
+                                                          color: const Color(
+                                                              0xff6D93F7))
+                                                  : textgetter.bodyMedium
+                                                      ?.copyWith(
+                                                          color: const Color
+                                                              .fromARGB(
+                                                              255, 32, 25, 25)),
+                                            ),
+                                          ));
+                                    }).toList(),
+                                    value: provider.category,
+                                    onChanged: (String? value) {
+                                      provider.setCategory(value: value ?? "");
+                                    },
+                                    buttonStyleData: const ButtonStyleData(
+                                      padding: EdgeInsets.fromLTRB(2, 0, 2, 0),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                    ),
+                                    dropdownStyleData: const DropdownStyleData(
+                                      offset: Offset(0, 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(8),
+                                          bottomRight: Radius.circular(8),
+                                        ),
+                                      ),
+                                    ),
+                                    menuItemStyleData: const MenuItemStyleData(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 8.0),
+                                      // customHeights: _getCustomItemsHeights(),
+                                    ),
+                                    iconStyleData: const IconStyleData(
+                                      iconSize: 30,
+                                      openMenuIcon: Icon(Icons.arrow_drop_up),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  final result =
+                                      await showCalendarDatePicker2Dialog(
+                                    context: context,
+                                    dialogSize: Size(
+                                        MediaQuery.of(context).size.width, 300),
+                                    config:
+                                        CalendarDatePicker2WithActionButtonsConfig(
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                      calendarViewMode:
+                                          CalendarDatePicker2Mode.day,
+                                      currentDate: DateTime.now(),
+                                      selectedDayHighlightColor:
+                                          Color(0xff6D93F7),
+                                      dayTextStylePredicate: ({required date}) {
+                                        if (date.weekday == DateTime.saturday ||
+                                            date.weekday == DateTime.sunday) {
+                                          return textgetter.bodyMedium
+                                              ?.copyWith(color: Colors.red);
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  );
+                                  if (result != null) {
+                                    provider.setDatePeriod(
+                                        dateTimeList: result);
+                                  }
+                                },
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(8, 10, 8, 10),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "Validity Period",
+                                        style: textgetter.bodyMedium?.copyWith(
+                                            color: const Color(0xffAAAAAA)),
+                                      ),
+                                      const SizedBox(
+                                        height: 16,
+                                        child: VerticalDivider(
+                                          thickness: 1,
+                                          color: Color(0xffAAAAAA),
+                                        ),
+                                      ),
+                                      const Padding(
+                                          padding:
+                                              EdgeInsets.fromLTRB(4, 0, 0, 0)),
+                                      Text(
+                                        DateFormat("yyyy-MM-dd").format(
+                                            provider.startTime != null
+                                                ? provider.startTime!
+                                                : DateTime.now()),
+                                        style: textgetter.bodyMedium?.copyWith(
+                                            color: provider.startTime != null
+                                                ? Color(0xff6D93F7)
+                                                : const Color(0xffAAAAAA)),
+                                      ),
+                                      Text(
+                                        "～",
+                                        style: textgetter.bodyMedium?.copyWith(
+                                            color: Color(0xffAAAAAA)),
+                                      ),
+                                      Text(
+                                        DateFormat("yyyy-MM-dd").format(
+                                            provider.entTime != null
+                                                ? provider.entTime!
+                                                : DateTime.now()),
+                                        style: textgetter.bodyMedium?.copyWith(
+                                            color: provider.startTime != null
+                                                ? Color(0xff6D93F7)
+                                                : Color(0xffAAAAAA)),
+                                      ),
+                                      const Spacer(),
+                                      const Icon(
+                                        Icons.date_range_sharp,
+                                        color: Color(0xffAAAAAA),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 16,
+                              ),
+                              Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(36, 8, 36, 0),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10)),
+                                width: MediaQuery.of(context).size.width,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Coupon Details",
+                                      style: textgetter.titleLarge?.copyWith(
+                                          color: const Color(0xff2E2E2E)),
+                                    ),
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        //TODO: 上傳圖片
+                                      },
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: 150,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xffE6E6E6),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                                "image/image_placeholder.png"),
+                                            const Padding(
+                                                padding: EdgeInsets.all(4)),
+                                            Text(
+                                              "Upload your coupon",
+                                              style: textgetter.bodyMedium
+                                                  ?.copyWith(
+                                                      color: const Color(
+                                                          0xffAAAAAA)),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 200,
+                                      child: TextFormField(
+                                        controller: contentController,
+                                        minLines: 1,
+                                        maxLines: 100,
+                                        decoration: InputDecoration(
+                                            hintStyle: textgetter.bodyMedium
+                                                ?.copyWith(
+                                                    color: const Color(
+                                                        0xffAAAAAA)),
+                                            hintText:
+                                                "Please enter the coupon content.",
+                                            border: const OutlineInputBorder(
+                                                borderSide: BorderSide.none)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(8, 10, 8, 10),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Row(
-                        children: [
-                          Text(
-                            "使用期間",
-                            style: textgetter.bodyMedium
-                                ?.copyWith(color: Color(0xffAAAAAA)),
-                          ),
-                          Padding(padding: EdgeInsets.fromLTRB(12, 0, 12, 0)),
-                          SizedBox(
-                            height: 16,
-                            child: VerticalDivider(
-                              thickness: 2,
-                              color: Color(0xffAAAAAA),
-                            ),
-                          ),
-                          Padding(padding: EdgeInsets.fromLTRB(8, 0, 0, 0)),
-                          Text(
-                            "${DateFormat("yyyy-MM-dd").format(DateTime(2024, 10, 10))} ~ ${DateFormat("yyyy-MM-dd").format(DateTime(2024, 10, 25))}",
-                            style: textgetter.bodyMedium
-                                ?.copyWith(color: Color(0xffAAAAAA)),
-                          ),
-                          const Spacer(),
-                          Icon(
-                            Icons.date_range_sharp,
-                            color: Color(0xffAAAAAA),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(36, 8, 36, 0),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10)),
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            "優惠券詳情",
-                            style: textgetter.titleLarge
-                                ?.copyWith(color: Color(0xff2E2E2E)),
-                          ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              //TODO: 上傳圖片
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 150,
-                              width: MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                color: Color(0xffE6E6E6),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset("image/image_placeholder.png"),
-                                  const Padding(padding: EdgeInsets.all(4)),
-                                  Text(
-                                    "上傳優惠券",
-                                    style: textgetter.bodyMedium
-                                        ?.copyWith(color: Color(0xffAAAAAA)),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 200,
-                            child: TextFormField(
-                              minLines: 1,
-                              maxLines: 100,
-                              decoration: InputDecoration(
-                                  hintStyle: textgetter.bodyMedium
-                                      ?.copyWith(color: Color(0xffAAAAAA)),
-                                  hintText: "請輸入優惠券內容",
-                                  border: OutlineInputBorder(
-                                      borderSide: BorderSide.none)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
                   ],
                 ),
-              ),
-            ),
-          ),
-        ],
+              );
+            },
+          );
+        },
       ),
     );
-  }
-
-  List<DropdownMenuItem<String>> _addDividersAfterItems(List<String> items) {
-    final List<DropdownMenuItem<String>> menuItems = [];
-    for (final String item in items) {
-      menuItems.addAll(
-        [
-          DropdownMenuItem<String>(
-            value: item,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                item,
-                style: const TextStyle(
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-
-          //If it's last item, we will not add Divider after it.
-          if (item != items.last)
-            const DropdownMenuItem<String>(
-              enabled: false,
-              child: Divider(
-                height: 1,
-                color: Color(0xffECECEC),
-              ),
-            ),
-        ],
-      );
-    }
-    return menuItems;
-  }
-
-  List<double> _getCustomItemsHeights() {
-    final List<double> itemsHeights = [];
-    for (int i = 0; i < (items.length * 2) - 1; i++) {
-      if (i.isEven) {
-        itemsHeights.add(50);
-      }
-      //Dividers indexes will be the odd indexes
-      if (i.isOdd) {
-        itemsHeights.add(2);
-      }
-    }
-
-    return itemsHeights;
   }
 }
