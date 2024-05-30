@@ -14,7 +14,7 @@ class CouponsDB {
       await database.execute("""CREATE TABLE IF NOT EXISTS $tableName (
       "id"  INTEGER NOT NULL,
       "store_name" VARCHAR(255) NOT NULL,
-      "category" VARCHAR(255) NOT NULL
+      "category" VARCHAR(255) NOT NULL,
       "start_time" INTEGER NOT NULL,
       "end_time" INTEGER NOT NULL,
       "create_time" INTEGER NOT NULL,

@@ -1,4 +1,8 @@
+import 'package:coupon_collection/core/database/coupons_db_view_model.dart';
+import 'package:coupon_collection/core/entities/coupon_model.dart';
 import 'package:flutter/material.dart';
+
+final couponsDBProvider = CouponsDBViewModel();
 
 class HomePageViewModel extends ChangeNotifier {
   // final _content = BehaviorSubject<String>.seeded("");
@@ -8,6 +12,7 @@ class HomePageViewModel extends ChangeNotifier {
   // void sdskd() async {
   //   _content.add("hehehehe");
   // }
+  List<CouponModel>? couponList;
 
   String? _category;
 
@@ -33,6 +38,11 @@ class HomePageViewModel extends ChangeNotifier {
 
   void setSortoption({required String value}) {
     _sortoption = value;
+    notifyListeners();
+  }
+
+  Future<void> fetchAllCoupon() async {
+    couponList = await couponsDBProvider.fetchCoupons();
     notifyListeners();
   }
 }

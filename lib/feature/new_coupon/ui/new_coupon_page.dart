@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:coupon_collection/core/custom/show_snackbar.dart';
 import 'package:coupon_collection/core/styles/textgetter.dart';
 import 'package:coupon_collection/core/utils/dropdown_item.dart';
 import 'package:coupon_collection/feature/new_coupon/domain/new_coupon_view_model.dart';
@@ -54,23 +57,24 @@ class _NewCouponPageState extends State<NewCouponPage> {
                   backgroundColor: const Color(0xffEE95A4),
                   iconTheme: const IconThemeData(color: Colors.white),
                   leading: IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new_outlined),
+                    icon: const Icon(Icons.arrow_back_ios_new_outlined),
                     onPressed: () {
                       showCupertinoDialog(
                           context: context,
                           builder: (context) {
                             return CupertinoAlertDialog(
-                              title: Text("Quit"),
-                              content: Text("Are you sure to leave right now？"),
+                              title: const Text("Quit"),
+                              content: const Text(
+                                  "Are you sure to leave right now？"),
                               actions: [
                                 CupertinoDialogAction(
-                                  child: Text("No"),
+                                  child: const Text("No"),
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
                                 ),
                                 CupertinoDialogAction(
-                                  child: Text("Yes"),
+                                  child: const Text("Yes"),
                                   onPressed: () {
                                     Navigator.pop(context);
                                     Navigator.pop(context);
@@ -88,8 +92,30 @@ class _NewCouponPageState extends State<NewCouponPage> {
                   ),
                   actions: [
                     TextButton(
-                        onPressed: () {
-                          if (formKey.currentState?.validate() == true) {}
+                        onPressed: () async {
+                          if (formKey.currentState?.validate() == true) {
+                            provider.validateForm();
+
+                            if (provider.notValidateMessage!.isNotEmpty) {
+                              ShowSnackBarHelper.errorSnackBar(context: context)
+                                  .showSnackbar(
+                                      provider.notValidateMessage ?? "");
+                            } else {
+                              await provider.addCoupon(
+                                  storeName: storeNameController.text);
+
+                              if (provider.insertResult?.isSuccess == true) {
+                                ShowSnackBarHelper.successSnackBar(
+                                        context: context)
+                                    .showSnackbar("Addition successful.");
+                                Navigator.pop(context);
+                              } else {
+                                ShowSnackBarHelper.errorSnackBar(
+                                        context: context)
+                                    .showSnackbar("Addition failed.");
+                              }
+                            }
+                          }
                         },
                         child: Text(
                           "Done",
@@ -316,37 +342,74 @@ class _NewCouponPageState extends State<NewCouponPage> {
                                       height: 16,
                                     ),
                                     GestureDetector(
-                                      onTap: () {
+                                      onTap: () async {
                                         //TODO: 上傳圖片
+                                        showCupertinoModalPopup(
+                                          context: context,
+                                          builder: (context) =>
+                                              CupertinoActionSheet(
+                                            title: const Text(
+                                                "Please select upload method"),
+                                            actions: [
+                                              CupertinoActionSheetAction(
+                                                child: const Text(
+                                                    "From Photo Library"),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  provider.setImage(
+                                                      fromCamera: false);
+                                                },
+                                              ),
+                                              CupertinoActionSheetAction(
+                                                child: const Text("Take Photo"),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  provider.setImage(
+                                                      fromCamera: true);
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
                                       },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        height: 150,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xffE6E6E6),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Image.asset(
-                                                "image/image_placeholder.png"),
-                                            const Padding(
-                                                padding: EdgeInsets.all(4)),
-                                            Text(
-                                              "Upload your coupon",
-                                              style: textgetter.bodyMedium
-                                                  ?.copyWith(
-                                                      color: const Color(
-                                                          0xffAAAAAA)),
+                                      child: provider.imageFile != null
+                                          ? ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: Image.file(
+                                                  provider.imageFile ??
+                                                      File("")),
                                             )
-                                          ],
-                                        ),
-                                      ),
+                                          : Container(
+                                              alignment: Alignment.center,
+                                              height: 150,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xffE6E6E6),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Image.asset(
+                                                      "image/image_placeholder.png"),
+                                                  const Padding(
+                                                      padding:
+                                                          EdgeInsets.all(4)),
+                                                  Text(
+                                                    "Upload your coupon",
+                                                    style: textgetter.bodyMedium
+                                                        ?.copyWith(
+                                                            color: const Color(
+                                                                0xffAAAAAA)),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                     ),
                                     SizedBox(
                                       height: 200,
