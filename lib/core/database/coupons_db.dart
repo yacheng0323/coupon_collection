@@ -70,14 +70,26 @@ class CouponsDB {
     }
   }
 
+  //* 藉由id搜尋物件
+  Future<CouponModel> fetchById(int id) async {
+    try {
+      final database = await GetIt.I.get<DatabaseService>().database;
+      final record = await database
+          .rawQuery('''SELECT * from $tableName WHERE id = ?''', [id]);
+      return CouponModel.fromSqfliteDatabase(record.first);
+    } catch (err, s) {
+      throw Error.throwWithStackTrace(err, s);
+    }
+  }
+
   //* 回傳id
-  Future<int?> getId(String store_name) async {
+  Future<int?> getId(int create_time) async {
     try {
       final db = await GetIt.I.get<DatabaseService>().database;
       List<Map<String, dynamic>> result = await db.query(
         tableName,
-        where: "store_name = ?",
-        whereArgs: [store_name],
+        where: "create_time = ?",
+        whereArgs: [create_time],
         columns: ["id"],
       );
       if (result.isNotEmpty) {
@@ -157,7 +169,7 @@ class CouponsDB {
       final database = await GetIt.I.get<DatabaseService>().database;
       await database.execute("DROP TABLE $tableName");
       return DeleteResult(isDeleted: true);
-    } catch (err, s) {
+    } catch (err) {
       return DeleteResult(isDeleted: false, errorMessage: "$err");
     }
   }

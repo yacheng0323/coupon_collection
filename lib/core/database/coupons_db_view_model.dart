@@ -25,7 +25,7 @@ class CouponsDBViewModel extends ChangeNotifier {
 
   Future<int?> getId(CouponModel coupon) async {
     try {
-      return await couponsDB.getId(coupon.storeName);
+      return await couponsDB.getId(coupon.createTime);
     } catch (err, s) {
       throw Error.throwWithStackTrace(err, s);
     }
@@ -46,7 +46,15 @@ class CouponsDBViewModel extends ChangeNotifier {
           image_path: item["image_path"]);
       return UpdateResult(isUpdated: true);
     } catch (err) {
-      return UpdateResult(isUpdated: false, errorMessage: "$err");
+      return UpdateResult(isUpdated: false, errorMessage: "Update failed");
+    }
+  }
+
+  Future<CouponModel> fetchById(int id) async {
+    try {
+      return await couponsDB.fetchById(id);
+    } catch (err, s) {
+      Error.throwWithStackTrace(err, s);
     }
   }
 

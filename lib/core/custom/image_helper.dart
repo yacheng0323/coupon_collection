@@ -1,6 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:coupon_collection/core/utils/pair.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
 class ImageHelper extends ChangeNotifier {
-  Future<File?> getImage({required bool fromCamera}) async {
+  Future<Pair<File?, String>> getImage({required bool fromCamera}) async {
     final pickedFile = await ImagePicker().pickImage(
       source: fromCamera ? ImageSource.camera : ImageSource.gallery,
       maxWidth: 1280,
@@ -25,25 +25,19 @@ class ImageHelper extends ChangeNotifier {
 
       if (croppedImage != null) {
         imagepath = path.join(documentDirectory.path, relativePath);
-        // _imageFile = croppedImage;
 
         log("croppedImage = ${croppedImage.lengthSync() / 1024} kb");
-
-        return await croppedImage.copy(imagepath);
+        await croppedImage.copy(imagepath);
+        return Pair(croppedImage, relativePath);
       } else {
         imagepath = path.join(documentDirectory.path, relativePath);
-        // _imageFile = image;
 
         log("image = ${image.lengthSync() / 1024} kb");
-
-        return await image.copy(imagepath);
+        await image.copy(imagepath);
+        return Pair(image, relativePath);
       }
-
-      // _displayImagePath = imagepath;
-      // _databaseImagePath = relativePath;
-
-      // notifyListeners();
     }
+    return Pair(File(""), "");
   }
 
   Future<File?> cropImage({required File pickerImage}) async {

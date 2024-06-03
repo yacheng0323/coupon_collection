@@ -1,10 +1,10 @@
 import 'dart:io';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:coupon_collection/core/custom/show_snackbar.dart';
+import 'package:coupon_collection/core/entities/coupon_model.dart';
 import 'package:coupon_collection/core/styles/textgetter.dart';
-import 'package:coupon_collection/core/utils/dropdown_item.dart';
+import 'package:coupon_collection/feature/home/domain/home_page_view_model.dart';
 import 'package:coupon_collection/feature/new_coupon/domain/new_coupon_view_model.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,7 +15,16 @@ import 'package:provider/provider.dart';
 
 @RoutePage()
 class NewCouponPage extends StatefulWidget {
-  const NewCouponPage({super.key});
+  const NewCouponPage({
+    super.key,
+    this.coupon,
+    required this.isEditing,
+    required this.homePageViewModel,
+  });
+
+  final CouponModel? coupon;
+  final bool isEditing;
+  final HomePageViewModel homePageViewModel;
 
   @override
   State<NewCouponPage> createState() => _NewCouponPageState();
@@ -23,8 +32,10 @@ class NewCouponPage extends StatefulWidget {
 
 class _NewCouponPageState extends State<NewCouponPage> {
   final formKey = GlobalKey<FormState>();
-  late final storeNameController = TextEditingController();
-  late final contentController = TextEditingController();
+  late final storeNameController =
+      TextEditingController(text: widget.coupon?.storeName);
+  late final contentController =
+      TextEditingController(text: widget.coupon?.content);
 
   @override
   void initState() {
@@ -46,6 +57,9 @@ class _NewCouponPageState extends State<NewCouponPage> {
       child: ChangeNotifierProvider(
         create: (context) {
           NewCouponViewModel newCouponViewModel = NewCouponViewModel();
+          if (widget.isEditing) {
+            newCouponViewModel.init(widget.coupon!);
+          }
 
           return newCouponViewModel;
         },
@@ -101,18 +115,45 @@ class _NewCouponPageState extends State<NewCouponPage> {
                                   .showSnackbar(
                                       provider.notValidateMessage ?? "");
                             } else {
-                              await provider.addCoupon(
-                                  storeName: storeNameController.text);
-
-                              if (provider.insertResult?.isSuccess == true) {
-                                ShowSnackBarHelper.successSnackBar(
-                                        context: context)
-                                    .showSnackbar("Addition successful.");
-                                Navigator.pop(context);
+                              if (widget.isEditing) {
+                                await provider.updateCoupon(
+                                    coupon: widget.coupon!,
+                                    storeName: storeNameController.text,
+                                    content: contentController.text);
+                                if (provider.updateResult?.isUpdated == true) {
+                                  ShowSnackBarHelper.successSnackBar(
+                                          context: context)
+                                      .showSnackbar("Update successful");
+                                  Navigator.pop(context);
+                                  await widget.homePageViewModel
+                                      .fetchAllCoupon();
+                                } else {
+                                  ShowSnackBarHelper.errorSnackBar(
+                                          context: context)
+                                      .showSnackbar(
+                                          provider.updateResult?.errorMessage ??
+                                              "");
+                                }
                               } else {
-                                ShowSnackBarHelper.errorSnackBar(
-                                        context: context)
-                                    .showSnackbar("Addition failed.");
+                                await provider.addCoupon(
+                                    storeName: storeNameController.text,
+                                    content: contentController.text);
+
+                                if (provider.insertResult?.isSuccess == true) {
+                                  if (!context.mounted) return;
+                                  ShowSnackBarHelper.successSnackBar(
+                                          context: context)
+                                      .showSnackbar("Addition successful.");
+                                  Navigator.pop(context);
+                                  await widget.homePageViewModel
+                                      .fetchAllCoupon();
+                                } else {
+                                  if (!context.mounted) return;
+
+                                  ShowSnackBarHelper.errorSnackBar(
+                                          context: context)
+                                      .showSnackbar("Addition failed.");
+                                }
                               }
                             }
                           }
@@ -142,7 +183,7 @@ class _NewCouponPageState extends State<NewCouponPage> {
                               TextFormField(
                                 controller: storeNameController,
                                 style: textgetter.bodyLarge?.copyWith(
-                                    color: Color(0xff6D93F7),
+                                    color: const Color(0xff6D93F7),
                                     fontWeight: FontWeight.w700),
                                 inputFormatters: [
                                   LengthLimitingTextInputFormatter(100)
@@ -176,7 +217,14 @@ class _NewCouponPageState extends State<NewCouponPage> {
                                     hint: Text("Category",
                                         style: textgetter.bodyMedium?.copyWith(
                                             color: const Color(0xffAAAAAA))),
-                                    items: categoryList.map((item) {
+                                    items: [
+                                      "Electronics",
+                                      "Cosmetics",
+                                      "Supplies",
+                                      "Foods",
+                                      "Clothes",
+                                      "Other",
+                                    ].map((item) {
                                       return DropdownMenuItem<String>(
                                           value: item,
                                           child: Center(
@@ -246,7 +294,7 @@ class _NewCouponPageState extends State<NewCouponPage> {
                                           CalendarDatePicker2Mode.day,
                                       currentDate: DateTime.now(),
                                       selectedDayHighlightColor:
-                                          Color(0xff6D93F7),
+                                          const Color(0xff6D93F7),
                                       dayTextStylePredicate: ({required date}) {
                                         if (date.weekday == DateTime.saturday ||
                                             date.weekday == DateTime.sunday) {
@@ -292,13 +340,13 @@ class _NewCouponPageState extends State<NewCouponPage> {
                                                 : DateTime.now()),
                                         style: textgetter.bodyMedium?.copyWith(
                                             color: provider.startTime != null
-                                                ? Color(0xff6D93F7)
+                                                ? const Color(0xff6D93F7)
                                                 : const Color(0xffAAAAAA)),
                                       ),
                                       Text(
                                         "～",
                                         style: textgetter.bodyMedium?.copyWith(
-                                            color: Color(0xffAAAAAA)),
+                                            color: const Color(0xffAAAAAA)),
                                       ),
                                       Text(
                                         DateFormat("yyyy-MM-dd").format(
@@ -307,8 +355,8 @@ class _NewCouponPageState extends State<NewCouponPage> {
                                                 : DateTime.now()),
                                         style: textgetter.bodyMedium?.copyWith(
                                             color: provider.startTime != null
-                                                ? Color(0xff6D93F7)
-                                                : Color(0xffAAAAAA)),
+                                                ? const Color(0xff6D93F7)
+                                                : const Color(0xffAAAAAA)),
                                       ),
                                       const Spacer(),
                                       const Icon(
@@ -343,7 +391,6 @@ class _NewCouponPageState extends State<NewCouponPage> {
                                     ),
                                     GestureDetector(
                                       onTap: () async {
-                                        //TODO: 上傳圖片
                                         showCupertinoModalPopup(
                                           context: context,
                                           builder: (context) =>
