@@ -1,11 +1,14 @@
 import 'package:coupon_collection/core/database/coupons_db_view_model.dart';
 import 'package:coupon_collection/core/date_extension.dart';
 import 'package:coupon_collection/core/entities/coupon_model.dart';
+import 'package:coupon_collection/core/entities/delete_result.dart';
 import 'package:flutter/material.dart';
 
 final couponsDBProvider = CouponsDBViewModel();
 
 class HomePageViewModel extends ChangeNotifier {
+  DeleteResult? deleteResult;
+
   List<CouponModel>? couponList;
 
   String? _category;
@@ -91,7 +94,7 @@ class HomePageViewModel extends ChangeNotifier {
     int? id = await couponsDBProvider.getId(data);
 
     if (id != null) {
-      await couponsDBProvider.deleteCoupon(data, id);
+      deleteResult = await couponsDBProvider.deleteCoupon(data, id);
     }
 
     await fetchAllCoupon();

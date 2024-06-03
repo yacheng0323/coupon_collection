@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:coupon_collection/core/custom/show_snackbar.dart';
 import 'package:coupon_collection/core/date_extension.dart';
 import 'package:coupon_collection/core/router/app_router.gr.dart';
 import 'package:coupon_collection/core/styles/textgetter.dart';
@@ -283,6 +284,23 @@ class _HomePageState extends State<HomePage> {
 
                                                   // ignore: use_build_context_synchronously
                                                   Navigator.of(context).pop();
+                                                  if (provider.deleteResult
+                                                          ?.isDeleted ==
+                                                      true) {
+                                                    ShowSnackBarHelper
+                                                            .successSnackBar(
+                                                                context:
+                                                                    context)
+                                                        .showSnackbar(
+                                                            "Deletion successful");
+                                                  } else {
+                                                    ShowSnackBarHelper
+                                                            .errorSnackBar(
+                                                                context:
+                                                                    context)
+                                                        .showSnackbar(
+                                                            "Deletion failed");
+                                                  }
                                                 },
                                                 child: const Text("Delete")),
                                             TextButton(

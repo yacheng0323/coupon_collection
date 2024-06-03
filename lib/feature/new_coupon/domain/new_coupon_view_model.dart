@@ -129,6 +129,8 @@ class NewCouponViewModel extends ChangeNotifier {
           content: content);
       updateResult = await couponsDBProvider.updateCoupon(result, id);
     }
+    await handleTemporaryDirectory();
+    await copyImageToDocumentDirectory();
     notifyListeners();
   }
 
