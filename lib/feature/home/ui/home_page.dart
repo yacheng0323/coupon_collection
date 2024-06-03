@@ -321,7 +321,6 @@ class _HomePageState extends State<HomePage> {
                                               coupon: item,
                                               homePageViewModel: provider));
                                     },
-                                    // minVerticalPadding: 4,
                                     contentPadding:
                                         const EdgeInsets.fromLTRB(8, 4, 8, 4),
                                     title: Padding(
@@ -329,14 +328,18 @@ class _HomePageState extends State<HomePage> {
                                           const EdgeInsets.fromLTRB(0, 0, 0, 4),
                                       child: Row(
                                         children: [
-                                          Text(
-                                            item.storeName,
-                                            style: textgetter.titleLarge
-                                                ?.copyWith(
-                                                    color:
-                                                        const Color(0xff2E2E2E),
-                                                    fontWeight:
-                                                        FontWeight.w700),
+                                          Expanded(
+                                            child: Text(
+                                              overflow: TextOverflow.ellipsis,
+                                              item.storeName,
+                                              style: textgetter.titleLarge
+                                                  ?.copyWith(
+                                                      color: const Color(
+                                                          0xff2E2E2E),
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                              maxLines: 1,
+                                            ),
                                           ),
                                           const SizedBox(
                                             width: 4,
@@ -375,17 +378,21 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                     subtitle: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(
                                           children: [
-                                            Text(
-                                              "Validity：${DateFormat("yyyy/MM/dd").format(DateTime.fromMillisecondsSinceEpoch(item.startTime * 1000))} ~ ${DateFormat("yyyy/MM/dd").format(DateTime.fromMillisecondsSinceEpoch(item.endTime * 1000))}",
-                                              style: textgetter.bodySmall
-                                                  ?.copyWith(
-                                                      color: const Color(
-                                                          0xffAAAAAA)),
+                                            Expanded(
+                                              child: Text(
+                                                "Validity：${DateFormat("yyyy/MM/dd").format(DateTime.fromMillisecondsSinceEpoch(item.startTime * 1000))} ~ ${DateFormat("yyyy/MM/dd").format(DateTime.fromMillisecondsSinceEpoch(item.endTime * 1000))}",
+                                                style: textgetter.bodySmall
+                                                    ?.copyWith(
+                                                        color: const Color(
+                                                            0xffAAAAAA)),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
-                                            const Spacer(),
                                             const Icon(
                                               Symbols.edit_square,
                                               size: 20,
