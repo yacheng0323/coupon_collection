@@ -29,11 +29,11 @@ class CouponsDB {
 
   //* 建立一筆資料
   Future<InsertResult> insert({
-    required String store_name,
+    required String storeName,
     required String category,
-    required int start_time,
-    required int end_time,
-    required int create_time,
+    required int startTime,
+    required int endTime,
+    required int createTime,
     String? content,
     String? imagepath,
   }) async {
@@ -42,11 +42,11 @@ class CouponsDB {
       await database.rawInsert(
           '''INSERT INTO $tableName (store_name,category,start_time,end_time,create_time,content,image_path) VALUES (?,?,?,?,?,?,?)''',
           [
-            store_name,
+            storeName,
             category,
-            start_time,
-            end_time,
-            create_time,
+            startTime,
+            endTime,
+            createTime,
             content,
             imagepath
           ]);
@@ -83,13 +83,13 @@ class CouponsDB {
   }
 
   //* 回傳id
-  Future<int?> getId(int create_time) async {
+  Future<int?> getId(int createTime) async {
     try {
       final db = await GetIt.I.get<DatabaseService>().database;
       List<Map<String, dynamic>> result = await db.query(
         tableName,
         where: "create_time = ?",
-        whereArgs: [create_time],
+        whereArgs: [createTime],
         columns: ["id"],
       );
       if (result.isNotEmpty) {
@@ -104,36 +104,36 @@ class CouponsDB {
 
   Future<UpdateResult> update({
     required int id,
-    required String? store_name,
+    required String? storeNname,
     required String? category,
-    required int? start_time,
-    required int? end_time,
-    required int? create_time,
+    required int? startTime,
+    required int? endTime,
+    required int? createTime,
     String? content,
-    String? image_path,
+    String? imagePath,
   }) async {
     try {
       final database = await GetIt.I.get<DatabaseService>().database;
       final Map<String, dynamic> updatedData = {};
 
-      if (store_name != null) updatedData["store_name"] = store_name;
+      if (storeNname != null) updatedData["store_name"] = storeNname;
       if (category != null) updatedData["category"] = category;
-      if (start_time != null) updatedData["start_time"] = start_time;
-      if (end_time != null) updatedData["end_time"] = end_time;
-      if (create_time != null) updatedData["create_time"] = create_time;
+      if (startTime != null) updatedData["start_time"] = startTime;
+      if (endTime != null) updatedData["end_time"] = endTime;
+      if (createTime != null) updatedData["create_time"] = createTime;
       if (content != null) updatedData["content"] = content;
-      if (image_path != null) updatedData["image_path"] = image_path;
+      if (imagePath != null) updatedData["image_path"] = imagePath;
 
       await database.rawUpdate(
           '''UPDATE $tableName SET store_name = ?, category = ?,start_time = ?,end_time = ?,create_time = ?,content = ?,image_path = ? where id = ?''',
           [
-            store_name,
+            storeNname,
             category,
-            start_time,
-            end_time,
-            create_time,
+            startTime,
+            endTime,
+            createTime,
             content,
-            image_path,
+            imagePath,
             id
           ]);
       return UpdateResult(isUpdated: true);

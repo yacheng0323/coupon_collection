@@ -14,11 +14,11 @@ class CouponsDBViewModel extends ChangeNotifier {
 
   Future<InsertResult> newCoupon(CouponModel coupon) async {
     return await couponsDB.insert(
-        store_name: coupon.storeName,
+        storeName: coupon.storeName,
         category: coupon.category,
-        start_time: coupon.startTime,
-        end_time: coupon.endTime,
-        create_time: coupon.createTime,
+        startTime: coupon.startTime,
+        endTime: coupon.endTime,
+        createTime: coupon.createTime,
         content: coupon.content,
         imagepath: coupon.imagePath);
   }
@@ -37,13 +37,13 @@ class CouponsDBViewModel extends ChangeNotifier {
     try {
       await couponsDB.update(
           id: id,
-          store_name: item["store_name"],
+          storeNname: item["store_name"],
           category: item["category"],
-          start_time: item["start_time"],
-          end_time: item["end_time"],
-          create_time: item["create_time"],
+          startTime: item["start_time"],
+          endTime: item["end_time"],
+          createTime: item["create_time"],
           content: item["content"],
-          image_path: item["image_path"]);
+          imagePath: item["image_path"]);
       return UpdateResult(isUpdated: true);
     } catch (err) {
       return UpdateResult(isUpdated: false, errorMessage: "Update failed");
