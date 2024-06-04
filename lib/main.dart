@@ -1,24 +1,32 @@
-import 'package:coupon_collection/core/styles/textgetter.dart';
-import 'package:coupon_collection/feature/home/ui/home_page.dart';
+import 'package:coupon_collection/core/injections.dart';
+import 'package:coupon_collection/core/router/app_router.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
+  await initInjections();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<StatefulWidget> createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  AppRouter appRouter = AppRouter();
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Coupon_Collection',
+    return MaterialApp.router(
+      routerConfig: appRouter.config(),
+      title: 'My_Coupons',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(),
     );
   }
 }
