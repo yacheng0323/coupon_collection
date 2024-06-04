@@ -1,4 +1,4 @@
-# coupon_collection
+# my_coupons
 
 A new Flutter project.
 
